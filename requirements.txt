@@ -1,0 +1,9 @@
+jupyter
+numpy
+scipy
+Pillow
+matplotlib
+scikit-image
+scikit-learn
+imgaug
+seaborn
