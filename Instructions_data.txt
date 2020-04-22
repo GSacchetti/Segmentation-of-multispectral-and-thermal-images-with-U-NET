@@ -6,7 +6,7 @@
 
 2°-  
 
-# In the "Builidin_data" folder: 
+# In the "Construction_data" folder: 
 
 #  You use : "python excel_to_tif_array.py" to convert these excele files to image (tif) and tables (Numpy)
 
