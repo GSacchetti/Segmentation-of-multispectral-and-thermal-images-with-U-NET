@@ -1,0 +1,29 @@
+#The different steps to do for learning and testing the U-NET model on our data:
+
+1° - PACKAGES INSTALLATION
+pip install -r requirements.txt
+
+2° - DATA PREPARATION 
+
+For the preparation of our dataset, you can apply the instructions noted in the file 
+data_preparation_instructions.txt, in order to convert the EXCEL files that you had 
+to download into TIF image and NUMPY tables (NPY).
+
+3° - Training and test U-NET model
+
+*** Training U-NET
+
+         python main.py
+         
+         
+4° - PREDICTION AND TESTING OF TRAINED MODEL 
+ 
+        python pred_unet.py
+        
+    
+ Note: For any instruction, remember to check the correspondence of the parameters in the scripts 
+ with the data set (the path to the training data, the size of the images and masks, the number of
+ image channels, etc.).
+ 
+ 
+ 
