@@ -2,10 +2,10 @@
 
 All steps available in the ipynb notebook named "Implementation_U-NET.ipynb"
 
-1° - PACKAGES INSTALLATION
+1° - Packages Installation :
 run "pip install -r requirements.txt"
 
-2° - DATA PREPARATION : Building of the training and test data sets : 
+2° - Data Preparation : Building of the training and test data sets : 
 
   a) Download the EXCELS files from the following drive : https://1drv.ms/f/s!/AgrWrFruN85rbarFzVMaBsOx10I and add them to the data/Excel folder
 
@@ -17,7 +17,7 @@ run "pip install -r requirements.txt"
 
 Run "python main.py"
 
-4° - PREDICTION AND TESTING OF TRAINED MODEL :
+4° - Prediction and Testing of the U-NET Model :
 
 Run "python pred_unet.py"
 
