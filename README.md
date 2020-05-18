@@ -1,17 +1,27 @@
 #Segmentation of multispectral and thermal images in vegetation environments with U-NET 
 
-# Building of learning and test data :
-1°-
+All steps available in the ipynb notebook named "Implementation_U-NET.ipynb"
 
-# Dowload the EXCELS files from the following the drive : https://1drv.ms/f/s!AgrWrFruN85rbarFzVMaBsOx10I
-# and add them to the the data / Excel folder
+1° - PACKAGES INSTALLATION
+run "pip install -r requirements.txt"
 
-2°-  
+2° - DATA PREPARATION : Building of the training and test data sets : 
 
-# In the "Construction_data" folder: 
+  a) Download the EXCELS files from the following drive : https://1drv.ms/f/s!/AgrWrFruN85rbarFzVMaBsOx10I and add them to the data/Excel folder
 
-#  Run : "python excel_to_tif_array.py" to convert these excel files to images (tif) and tables (Numpy)
+  b) In the "Construction_data" folder : Run "python excel_to_tif_array.py to convert the excel fies to tif imagis and Numpy tables
 
-3° - 
+  c) Run "python create_train_test_data.py" to split the data into a training and testing sets.
 
-# Run "python create_train_test_data.py" to split the data set into a training and testig set
+3° - Training U-NET model :
+
+Run "python main.py"
+
+4° - PREDICTION AND TESTING OF TRAINED MODEL :
+
+Run "python pred_unet.py"
+
+
+Note: For any instruction, remember to check the correspondence of the parameters in the scripts 
+with the data set (the path to the training data, the size of the images and masks, the number of
+image channels, etc.).
