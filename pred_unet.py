@@ -120,7 +120,6 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
       INPUT=np.zeros([1,Image.shape[0],Image.shape[1],INPUT_CHANNELS],dtype=np.float32)
       INPUT[0,:,:,:]=Image
       INPUT_Normal=data_normalizing.Normalizing_by_image_by_column(INPUT)
-      filename_verif=join(VERIFICATIONS_PATH,str(image)+'.png')
       for x in range(0,Image.shape[0]-INPUT_WIDTH,step):
         for y in range(0,Image.shape[1]-INPUT_HEIGHT,step):
           Input_data=np.zeros([1,INPUT_WIDTH,INPUT_HEIGHT,INPUT_CHANNELS],dtype=np.float32)
@@ -132,8 +131,12 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
               #enregistrer et verifier results 
               if j%24 == 0:
                   if i%24 == 0:
-                    Mask_Pred_Verif=np.zeros((Mask_pred[x+i,y+j].shape[0],Mask_pred[x+i,y+j].shape[1]),dtype=np.float32)
-                    imsave(filename_verif,Mask_pred_verif)
+                    filename_verif=join(VERIFICATIONS_PATH,'test'+str(j)+str(i)+'.png')
+                    Mask_Pred_Verif=np.array(Mask_pred[x+i,y+j])
+                    #print(type(Mask_Pred_Verif))
+                    #print(Mask_Pred_Verif.size)
+                    print(Mask_Pred_Verif)
+                    #imsave(filename_verif,Mask_Pred_Verif)
               NB_Pred[x+i,y+j]+=1
       
       NB_Pred[NB_Pred == 0] = 1
