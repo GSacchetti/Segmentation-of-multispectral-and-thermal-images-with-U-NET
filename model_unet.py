@@ -21,14 +21,14 @@ def Model_Unet(INPUT_WIDTH = 256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7):
 	
 	#Part 01: DOWN_BLOC
 
-	conv1 = Conv2D(16, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (inputs)
+	conv1 = Conv2D(16, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (inputs)
 	conv1 = Dropout(0.1) (conv1)
-	conv1 = Conv2D(16, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (conv1)
+	conv1 = Conv2D(16, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv1)
 	pool1 = MaxPooling2D((2, 2)) (conv1)
 
-	conv2 = Conv2D(32, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (pool1)
+	conv2 = Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (pool1)
 	conv2 = Dropout(0.1) (conv2)
-	conv2 = Conv2D(32, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (conv2)
+	conv2 = Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv2)
 	pool2 = MaxPooling2D((2, 2)) (conv2)
 
 	conv3 = Conv2D(64, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (pool2)
@@ -80,7 +80,7 @@ def Model_Unet(INPUT_WIDTH = 256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7):
 # Train_model=True : the condition whether one drives the model or not 
 # Load_weights=True : if we load the existing model that is already driven
 # validation_split, batch_size, epochs are the parameters of the model
-# X_Train_Normal, Y_Train, X_Test_Normal, Y_Test are the input and output vecteors of training and testing model
+# X_Train_Normal, Y_Train, X_Test_Normal, Y_Test are the input and output vectors of training and testing model
 # INPUT_WIDTH =96(256), INPUT_HEIGHT = 96(256), INPUT_CHANNELS = 7 the sizes and caracteristics of our data 
 # EVALUATION_PATH : it is the path of log folder
 
@@ -113,8 +113,8 @@ def Training_Model(Train_model=True, Load_weights=True, validation_split=0.01, b
 
 		# Summarize history for accuracy  
 		plt.subplot(211)  
-		plt.plot(history.history['acc'])  
-		plt.plot(history.history['val_acc'])  
+		plt.plot(history.history['accuracy'])  
+		plt.plot(history.history['val_accuracy'])  
 		plt.title('model accuracy')  
 		plt.ylabel('accuracy')  
 		plt.xlabel('epoch')  
@@ -130,6 +130,3 @@ def Training_Model(Train_model=True, Load_weights=True, validation_split=0.01, b
 		plt.xlabel('epoch')  
 		plt.legend(['train', 'test'], loc='upper left')   
 		plt.savefig(EVALUATION_PATH+'/Loss_Accuracy_Graphique.png')
-
-
-
