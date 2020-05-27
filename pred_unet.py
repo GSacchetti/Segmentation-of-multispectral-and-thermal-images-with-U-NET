@@ -67,7 +67,7 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
   start = time. time()
   if Prediction_Images_Mean is False:
   	# Classical rediction of Images
-  	# In the classic prediction, we take the multspectral and thermal images, we do the normalization, then we apply the trained model of U-NET.
+  	# In the classic prediction, we take the multispectral and thermal images, we do the normalization, then we apply the trained model of U-NET.
     for image in os.listdir(join(Path,'ImageArray')):
       image_Path=join(Path,'ImageArray',image)
       Image=np.load(image_Path)
@@ -125,19 +125,22 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
           Input_data=np.zeros([1,INPUT_WIDTH,INPUT_HEIGHT,INPUT_CHANNELS],dtype=np.float32)
           Input_data[0,:,:,:]=INPUT_Normal[:,x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT,:]
           results = model.predict(Input_data,verbose=1)
+          #Mask_pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT]+=results[]
+          #NB_Pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT] += 1
           for i in range(INPUT_WIDTH):
             for j in range(INPUT_HEIGHT):
               Mask_pred[x+i,y+j]+=results[0,i,j]
               #enregistrer et verifier results 
-              if j%24 == 0:
-                  if i%24 == 0:
-                    filename_verif=join(VERIFICATIONS_PATH,'test'+str(j)+str(i)+'.png')
-                    Mask_Pred_Verif=np.array(Mask_pred[x+i,y+j])
+              #if j%24 == 0:
+                  #if i%24 == 0:
+                    #filename_verif=join(VERIFICATIONS_PATH,'test'+str(j)+str(i)+'.png')
+                    #Mask_Pred_Verif=np.array(Mask_pred[x+i,y+j])
                     #print(type(Mask_Pred_Verif))
                     #print(Mask_Pred_Verif.size)
-                    print(Mask_Pred_Verif)
+                    #print(Mask_Pred_Verif)
                     #imsave(filename_verif,Mask_Pred_Verif)
               NB_Pred[x+i,y+j]+=1
+            
       
       NB_Pred[NB_Pred == 0] = 1
       assert(np.count_nonzero(NB_Pred == 0) == 0)
@@ -145,10 +148,15 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
       Mask_pred[Mask_pred<=threshold]=0
       Mask_pred[Mask_pred>=threshold]=255
       
+      #print(Mask_pred.shape)
       Mask_pred = Mask_pred.astype(np.uint8)
-      filename=join(EVALUATION_PATH,str(threshold)+str(image)+'.png')
-      print(filename)
-      imsave(filename,Mask_pred)
+      filename_image=join(EVALUATION_PATH,str(threshold)+str(image)+'.png')
+      filename_npy=join(EVALUATION_PATH,str(threshold)+str(image)+'.npy')
+      print(filename_image)
+      print(filename_npy)
+      imsave(filename_image,Mask_pred)
+      np.save(filename_npy,Mask_pred)
+      
       end = time. time()
       f.write('\n The time of execution"s prediction of the Image +'+str(image)+' :'+str(end-start)+'seconds')
   f.close()
