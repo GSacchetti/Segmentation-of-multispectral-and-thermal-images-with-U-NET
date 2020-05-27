@@ -57,8 +57,9 @@ def Training_Unet(mainPath='',Augmentation=True,nb_Augmentation=3,INPUT_WIDTH = 
 	 size_mask_Output=size_image_output,augment=Augmentation, nb_augment=nb_Augmentation)
 
 	#Check the max and min of each column of input data, it must equal to (1,1,1,1,1,1) and (0 0 0 0 0 0) respectively.
-	print(np.max(X_Train[:,:,0]),np.max(X_Train[:,:,1]), np.max(X_Train[:,:,2]),np.max(X_Train[:,:,3]),np.max(X_Train[:,:,4]),np.max(X_Train[:,:,5]),np.max(X_Train[:,:,6]))
-	print(np.min(X_Train[:,:,0]),np.min(X_Test[:,:,1]), np.max(X_Test[:,:,2]),np.max(X_Test[:,:,3]),np.max(X_Test[:,:,4]),np.max(X_Test[:,:,5]),np.max(X_Test[:,:,6]))
+    print("Initial data")
+    print([np.max(X_Train[:,:,i]) for i in range(7)])
+    print([np.min(X_Train[:,:,i]) for i in range(7)])
 
 	# Normalizing data
 	# Initializing vectors
@@ -67,15 +68,19 @@ def Training_Unet(mainPath='',Augmentation=True,nb_Augmentation=3,INPUT_WIDTH = 
 
 	X_Train_Normal=data_normalizing.Normalizing_by_image_by_column(X_Train)
 	X_Test_Normal=data_normalizing.Normalizing_by_image_by_column(X_Test)
-	print("the shape of X_Train is  ",np.shape(X_Train))
+    print("the shape of X_Train is  ",np.shape(X_Train))
+    print("the shape of normalized X_Train is  ",np.shape(X_Train_Normal))
 	print("the shape of Y_Train is  ",np.shape(Y_Train))
-	print("the shape of X_Test is  ",np.shape(X_Test))
+    print([np.max(X_Train_Normal[:,:,i]) for i in range(7)])
+    print([np.min(X_Train_Normal[:,:,i]) for i in range(7)])
+    print("the shape of X_Test is  ",np.shape(X_Test))
+    print("the shape of normalized X_Test is  ",np.shape(X_Test_Normal))
 	print("the shape of Y_test is  ",np.shape(Y_Test))
-	print(np.min(X_Train_Normal), np.max(X_Train_Normal))
-	print(np.min(X_Test_Normal), np.max(X_Test_Normal))
+    print([np.max(X_Test_Normal[:,:,i]) for i in range(7)])
+    print([np.min(X_Test_Normal[:,:,i]) for i in range(7)])
 
-	X_Train_Normal=X_Train
-	X_Test_Normal=X_Test
+	#X_Train_Normal=X_Train
+	#X_Test_Normal=X_Test
 
 	# Training model 
 
