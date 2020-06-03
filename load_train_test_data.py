@@ -1,9 +1,9 @@
-
 # -*- coding:Utf_8 -*-
 
 #This script allows to load simply the images and masks of training and the test in in matrices of inputs and vectors of output
 
 from PIL import Image
+from os.path import join
 import matplotlib.pyplot as plt
 import numpy  as np
 import math
@@ -19,7 +19,7 @@ start_time = time.time()
 # mainPath : the path or the way to our training and testing data set.
 # size_image_Input=[96,96,7]([256,256,7]),size_mask_Output=[96,96,1]([256,256,1]: the sizes of images and masks. 
 # augment=True, nb_augment=3 : augment: it is a question of whether or not we increase our data set and 
-#     "nb_augment = 3" is for the number of rotations of 90 °.
+#     "nb_augment = 3" is for the number of rotations of 90 Â°.
 # There are packages and functions that can generate them otherwise. However, this increase has greatly 
 #      improved our prediction results.
 
@@ -30,6 +30,7 @@ def load_training_test_data(mainPath='', size_image_Input=[96,96,7],
 	#loading of Input and Output data
 	#Initialization parameters and vetors training images and maskes set
 	PathTT=mainPath+'/data/'
+	VERIFICATIONS_PATH='/content/gdrive/My Drive/U-NET/VERIFICATIONS'
 	list_Input_train=sorted(os.listdir(PathTT+'TrainNPY/images'))
 	list_Output_train=sorted(os.listdir(PathTT+'TrainNPY/images'))
 	list_Input_train_Augment=sorted(os.listdir(PathTT+'TrainNPY/images'))
@@ -105,16 +106,26 @@ def load_training_test_data(mainPath='', size_image_Input=[96,96,7],
 		Y_Train[nb_Output]=OutputArray
 		nb_Output=+1
 		f_masks.write(str(Output)+'\n')
+		filename_verif=join(VERIFICATIONS_PATH,'output'+str(nb_Output)+'.png')
+		print(OutputArray.size)
+		print(type(OutputArray))
+		#imsave(filename_verif,OutputArray)
+
 
 	if augment==True:
 		List_Output=sorted(os.listdir(PathTT+'TrainNPY/Augment_masks'))
+		#print(list_Output)
 		for Output in List_Output:
 				OutputArray=np.load(PathTT+'TrainNPY/Augment_masks'+'/'+Output)
 				Y_Train[nb_Output]=OutputArray
 				nb_Output=nb_Output+1
 				g_masks.write(str(Output)+'\n')
+				filename_verif=join(VERIFICATIONS_PATH,'output'+str(nb_Output)+'.png')
+				print(OutputArray.size)
+				print(type(OutputArray))
+				#imsave(filename_verif,OutputArray)
 
-	#Initializing parameters of input an output testing vector
+	#Initializing parameters of input and output testing vector
 	nb_Input=0
 	nb_Output=0
 
@@ -141,5 +152,3 @@ def load_training_test_data(mainPath='', size_image_Input=[96,96,7],
 		g_masks.close()
 
 	return X_Train,Y_Train,X_Test,Y_Test
-
-
