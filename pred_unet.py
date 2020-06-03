@@ -125,7 +125,7 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
           Input_data=np.zeros([1,INPUT_WIDTH,INPUT_HEIGHT,INPUT_CHANNELS],dtype=np.float32)
           Input_data[0,:,:,:]=INPUT_Normal[:,x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT,:]
           results = model.predict(Input_data,verbose=1)
-          #Mask_pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT]+=results[]
+          #Mask_pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT]+= results[0,:,:]
           #NB_Pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT] += 1
           for i in range(INPUT_WIDTH):
             for j in range(INPUT_HEIGHT):
@@ -140,6 +140,7 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
                     #print(Mask_Pred_Verif)
                     #imsave(filename_verif,Mask_Pred_Verif)
               NB_Pred[x+i,y+j]+=1
+          
             
       
       NB_Pred[NB_Pred == 0] = 1
