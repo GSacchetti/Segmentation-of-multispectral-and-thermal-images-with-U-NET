@@ -131,24 +131,16 @@ def load_training_test_data(mainPath='', size_image_Input=[96,96,7],
         imsave(filename_verif,OutputArray)
 
     #Initializing parameters of input and output testing vector
-    nb_Input=0
-    nb_Output=0
-
     size_Input_test=[Test_Batch_size,size_image_Input[0],size_image_Input[1],size_image_Input[2]]
     size_Output_test=[Test_Batch_size,size_mask_Output[0],size_mask_Output[1],size_mask_Output[2]]
     X_Test=np.zeros(size_Input_test, dtype=np.float32) 
     Y_Test=np.zeros(size_Output_test, dtype=np.uint8) 
 
+    for nb_Input, Input in enumerate(sorted(os.listdir(PathTT+'TestNPY/images'))):
+        X_Test[nb_Input]=np.load(PathTT+'TestNPY/images/'+str(Input))
 
-    for Input in sorted(os.listdir(PathTT+'TestNPY/images')):
-        InputArray=np.load(PathTT+'TestNPY/images/'+str(Input))
-        X_Test[nb_Input]=InputArray
-        nb_Input+=1
-
-    for Output in sorted(os.listdir(PathTT+'TestNPY/masks')):
-        OutputArray=np.load(PathTT+'TestNPY/masks/'+Output)
-        Y_Test[nb_Output]=OutputArray
-        nb_Output+=1
+    for nb_Output, Output in enumerate(sorted(os.listdir(PathTT+'TestNPY/masks'))):
+        Y_Test[nb_Output]=np.load(PathTT+'TestNPY/masks/'+Output)
 
     f_images.close()
     f_masks.close()
