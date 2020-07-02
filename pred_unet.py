@@ -10,6 +10,7 @@ import os
 import sys
 import random
 from skimage.io import imsave,imread
+import matplotlib.pyplot as plt
 
 import time
 import datetime
@@ -42,6 +43,14 @@ from keras.preprocessing.image import ImageDataGenerator
 # Normalization : is the type of normalization
 # step : is the displacement step of the prediction patch
 
+def radius(x,y,input_size):
+  return  (((x-(input_size/2))**2)+ ((y-(input_size/2))**2))
+
+def weight(x,y,input_size):
+  R = radius(0,0,input_size)
+  r = radius(x,y,input_size)
+  return (R-r)/R
+
 
 def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,threshold=0.5,Prediction_Images_Mean=True,
 	Normalization='Normalisation_by_image_by_colomn',step=30):
@@ -65,6 +74,14 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
 
   # Image prediction time
   start = time. time()
+  
+  #Creation of the concentric circle for weight matrix
+  
+  indices = [[[(i+0.5),(j+0.5)] for i in range(INPUT_WIDTH)] for j in range(INPUT_HEIGHT)]
+  concentric_weights = np.array([[weight(x,y,INPUT_WIDTH) for x,y in ind] for ind in indices])
+  filename_verif=join(VERIFICATIONS_PATH,'concentric.png')
+  imsave(filename_verif,concentric_weights)
+  
   if Prediction_Images_Mean is False:
   	# Classical rediction of Images
   	# In the classic prediction, we take the multispectral and thermal images, we do the normalization, then we apply the trained model of U-NET.
@@ -82,13 +99,16 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
       print(np.min(X_Image_data_Normal))
       for ii in range(0,np.shape(X_Image_data_Normal)[1]-INPUT_WIDTH,INPUT_WIDTH):
         for jj in range(0,np.shape(X_Image_data_Normal)[2]-INPUT_HEIGHT,INPUT_HEIGHT):
-          print(ii,jj)
-          X_pred=np.zeros((INPUT_WIDTH,INPUT_HEIGHT,7),dtype=np.float32)
+          X_pred=np.zeros((INPUT_WIDTH,INPUT_HEIGHT,INPUT_CHANNELS),dtype=np.float32)
           Mask_pred=np.zeros((INPUT_WIDTH,INPUT_HEIGHT),dtype=np.uint8)
           # It should be data_normalizing[Normalization](X_Image_data_Normal[:,ii:ii+INPUT_WIDTH,jj:jj+INPUT_HEIGHT,:])
           X_pred=data_normalizing.Normalizing_by_image_by_column(X_Image_data_Normal[:,ii:ii+INPUT_WIDTH,jj:jj+INPUT_HEIGHT,:])
-          results = model.predict(X_pred,verbose=1)
-          print(np.shape(results))
+          results = model.predict(X_pred,verbose=1) 
+          
+          # Prepare for multiplying by the concentric weith matrix
+          #results = np.reshape(results,(96,96))
+          #results = np.array(map(mul,results,concentric_weights))
+          
           for i in range(INPUT_WIDTH):
             for j in range(INPUT_HEIGHT):
               if results[0,i,j] >= threshold: 
@@ -108,6 +128,7 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
     for image in os.listdir(join(Path,'ImageArray')):
       image_Path=join(Path,'ImageArray',image)
       Image=np.load(image_Path)
+      
       # To improve the prediction, we have introduce the array_mean variable. We make several predictions 
       # on the image by moving the patch square of 256 * 256 pixels (96 * 96, resp) with a step called "step".
       # At the end, we take the average of the values obtained from each pixel on the different predictions.
@@ -115,34 +136,43 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
       
       NB_Pred=np.zeros([Image.shape[0],Image.shape[1]],dtype=np.uint8)
       Mask_pred=np.zeros((Image.shape[0],Image.shape[1]),dtype=np.float32)
+      print(Image.shape[0],Image.shape[1])
       
+      #Try and get an appropriate step for both witdh and height
+      max_step = 50
+      step_x = 0
+      step_y = 0
+      for i in range(1,max_step):
+        if (((Image.shape[0] - INPUT_WIDTH)%i == 0) and (i > step_x)):
+            step_x = i
+        if (((Image.shape[1] - INPUT_HEIGHT)%i == 0) and (i > step_y)):
+            step_y = i
+      print(step_x,step_y)
       
       INPUT=np.zeros([1,Image.shape[0],Image.shape[1],INPUT_CHANNELS],dtype=np.float32)
       INPUT[0,:,:,:]=Image
       INPUT_Normal=data_normalizing.Normalizing_by_image_by_column(INPUT)
-      for x in range(0,Image.shape[0]-INPUT_WIDTH,step):
-        for y in range(0,Image.shape[1]-INPUT_HEIGHT,step):
+      for x in range(0,(Image.shape[0]-INPUT_WIDTH)+1,step):
+        for y in range(0,(Image.shape[1]-INPUT_HEIGHT)+1,step):
           Input_data=np.zeros([1,INPUT_WIDTH,INPUT_HEIGHT,INPUT_CHANNELS],dtype=np.float32)
           Input_data[0,:,:,:]=INPUT_Normal[:,x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT,:]
           results = model.predict(Input_data,verbose=1)
-          #Mask_pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT]+= results[0,:,:]
-          #NB_Pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT] += 1
+          
+          # Prepare for multiplying by the concentric weith matrix
+          #results = np.reshape(results,(96,96))
+          #np.matmul(results,concentric_weights,results)
+          #print(results.shape)
+          
+          #Mask_pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT]+=results[0,0:INPUT_WIDTH,0:INPUT_HEIGHT]
+          NB_Pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT] += 1
           for i in range(INPUT_WIDTH):
             for j in range(INPUT_HEIGHT):
               Mask_pred[x+i,y+j]+=results[0,i,j]
-              #enregistrer et verifier results 
-              #if j%24 == 0:
-                  #if i%24 == 0:
-                    #filename_verif=join(VERIFICATIONS_PATH,'test'+str(j)+str(i)+'.png')
-                    #Mask_Pred_Verif=np.array(Mask_pred[x+i,y+j])
-                    #print(type(Mask_Pred_Verif))
-                    #print(Mask_Pred_Verif.size)
-                    #print(Mask_Pred_Verif)
-                    #imsave(filename_verif,Mask_Pred_Verif)
-              NB_Pred[x+i,y+j]+=1
-          
             
-      
+            
+      NB_Pred_tmp = NB_Pred*20
+      filename_verif=join(VERIFICATIONS_PATH,'nb_pred.png')
+      imsave(filename_verif,NB_Pred_tmp)
       NB_Pred[NB_Pred == 0] = 1
       assert(np.count_nonzero(NB_Pred == 0) == 0)
       Mask_pred[:,:] /= NB_Pred[:,:]
@@ -152,11 +182,11 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
       #print(Mask_pred.shape)
       Mask_pred = Mask_pred.astype(np.uint8)
       filename_image=join(EVALUATION_PATH,str(threshold)+str(image)+'.png')
-      filename_npy=join(EVALUATION_PATH,str(threshold)+str(image)+'.npy')
+      #filename_npy=join(EVALUATION_PATH,str(threshold)+str(image)+'.npy')
       print(filename_image)
-      print(filename_npy)
+      #print(filename_npy)
       imsave(filename_image,Mask_pred)
-      np.save(filename_npy,Mask_pred)
+      #np.save(filename_npy,Mask_pred)
       
       end = time. time()
       f.write('\n The time of execution"s prediction of the Image +'+str(image)+' :'+str(end-start)+'seconds')
