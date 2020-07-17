@@ -1,5 +1,3 @@
-# -*- coding:Utf_8 -*-
-
 #This script allows to load simply the images and masks of training and the test in in matrices of inputs and vectors of output
 
 from PIL import Image
@@ -19,11 +17,14 @@ start_time = time.time()
 # mainPath : the path or the way to our training and testing data set.
 # size_image_Input=[96,96,7]([256,256,7]),size_mask_Output=[96,96,1]([256,256,1]: the sizes of images and masks. 
 # augment=True, nb_augment=3 : augment: it is a question of whether or not we increase our data set and 
-#     "nb_augment = 3" is for the number of rotations of 90 Â°.
+#     "nb_augment = 3" is for the number of rotations of 90 Ãƒâ€šÃ‚Â°.
 # There are packages and functions that can generate them otherwise. However, this increase has greatly 
 #      improved our prediction results.
 
-
+def mymkdir(path):
+	if not os.path.exists(path):
+		os.mkdir(path)
+		
 def load_training_test_data(mainPath='', size_image_Input=[96,96,7],
     size_mask_Output=[96,96,1],augment=True, nb_augment=3): 
 
@@ -110,9 +111,12 @@ def load_training_test_data(mainPath='', size_image_Input=[96,96,7],
             g_images.write(str(Input)+'\n')    
         else:
             f_images.write(str(Input)+'\n')
-        filename_verif=join(VERIFICATIONS_PATH,'input'+str(nb_Input)+'.png')
-        print(InputArray.shape, InputArray.dtype)
-        imsave(filename_verif,InputArray)
+        #name='Image'+str(nb_Input)
+        #PathVerif=join(VERIFICATIONS_PATH,name)
+        #mymkdir(PathVerif)
+        #for i in range (InputArray.shape[2]):
+        #    filename_verif=join(PathVerif,'input'+str(nb_Input)+'ch'+str(i)+'.png')
+        #    imsave(filename_verif,InputArray[:,:,i].astype(np.uint8))
 
     list_output_dirs = ['TrainNPY/masks/']
     if augment==True:
@@ -126,9 +130,8 @@ def load_training_test_data(mainPath='', size_image_Input=[96,96,7],
             g_masks.write(str(Output)+'\n')    
         else:
             f_masks.write(str(Output)+'\n')
-        filename_verif=join(VERIFICATIONS_PATH,'output'+str(nb_Output)+'.png')
-        print(OutputArray.shape, OutputArray.dtype)
-        imsave(filename_verif,OutputArray)
+        #filename_verif=join(join(VERIFICATIONS_PATH,'Image'+str(nb_Input)),'output'+str(nb_Output)+'.png')
+        #imsave(filename_verif,OutputArray.astype(np.uint8))
 
     #Initializing parameters of input and output testing vector
     size_Input_test=[Test_Batch_size,size_image_Input[0],size_image_Input[1],size_image_Input[2]]
