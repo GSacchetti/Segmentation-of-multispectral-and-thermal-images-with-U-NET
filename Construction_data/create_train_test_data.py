@@ -1,6 +1,3 @@
-	# -*- coding:Utf_8 -*-
-#######.  This algorithm  is to les create Test and training data sets of U-NET 
-   #######
 #Loading packages
 import numpy  as np
 import os,sys
@@ -10,10 +7,10 @@ import shutil
 import random
 random.seed(2019)
 
-#mainPath='/Users/rafikarezki/Desktop/Projet-Master/U-NET/'
-mainPath=os.getcwd()
-# The path of our dat set
-mainPath='/Users/rafikarezki/Desktop/U-NET_SEGMENTATION/data/'
+#mainPath='/content/drive/My Drive/U-NET'
+#mainPath=os.getcwd()
+# The path of our data set
+mainPath='/content/gdrive/My Drive/U-NET/data/'
 PathTIFandNPY=mainPath+'TIFandNPY/'
 PathTT=mainPath
 
@@ -61,7 +58,7 @@ def mymkdir(path):
 	if not os.path.exists(path):
 		os.mkdir(path)
 
-#Création de dossiers s'ils n'existaient pas 		
+#CrÃƒÆ’Ã‚Â©ation de dossiers s'ils n'existaient pas 		
 mymkdir(PathTT+'TrainNPY')
 mymkdir(PathTT+'TrainNPY')
 Train_path_data=PathTT+'TrainNPY/'
