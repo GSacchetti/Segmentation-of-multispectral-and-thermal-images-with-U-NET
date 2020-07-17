@@ -1,4 +1,3 @@
-# -*- coding:Utf_8 -*-
 #This script is for using the trained U-NET model, To make predictions on other images of our dataset.
 # uploading packages 
 
@@ -47,12 +46,12 @@ def radius(x,y,input_size):
   return  (((x-(input_size/2))**2)+ ((y-(input_size/2))**2))
 
 def weight(x,y,input_size):
-  R = radius(0,0,input_size)
-  r = radius(x,y,input_size)
-  return (R-r)/R
+  R = (radius(0,0,input_size))**(1/3)
+  r = (radius(x,y,input_size))**(1/3)
+  return (1/3)*(R-r)/(3*R)
 
 
-def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,threshold=0.5,Prediction_Images_Mean=True,
+def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,threshold=0.7,Prediction_Images_Mean=True,
 	Normalization='Normalisation_by_image_by_colomn',step=30):
 
   # Load model U-NET
@@ -79,8 +78,8 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
   
   indices = [[[(i+0.5),(j+0.5)] for i in range(INPUT_WIDTH)] for j in range(INPUT_HEIGHT)]
   concentric_weights = np.array([[weight(x,y,INPUT_WIDTH) for x,y in ind] for ind in indices])
-  filename_verif=join(VERIFICATIONS_PATH,'concentric.png')
-  imsave(filename_verif,concentric_weights)
+  #filename_verif=join(VERIFICATIONS_PATH,'concentric.png')
+  #imsave(filename_verif,concentric_weights)
   
   if Prediction_Images_Mean is False:
   	# Classical rediction of Images
@@ -106,22 +105,21 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
           results = model.predict(X_pred,verbose=1) 
           
           # Prepare for multiplying by the concentric weith matrix
-          #results = np.reshape(results,(96,96))
-          #results = np.array(map(mul,results,concentric_weights))
+          results = np.reshape(results,(96,96))
+          results = np.multiply(results,concentric_weights)
           
           for i in range(INPUT_WIDTH):
             for j in range(INPUT_HEIGHT):
-              if results[0,i,j] >= threshold: 
+              if results[i,j] >= threshold: 
                 Mask_pred[i,j]=255
               else:
                 Mask_pred[i,j]=0
 			
           Y_Image[ii:ii+INPUT_WIDTH,jj:jj+INPUT_HEIGHT]=Mask_pred
-      Y_Image_pred=Image.fromarray(Y_Image.astype('uint8')) 
-      Y_Image_pred.save(join(EVALUATION_PATH,str(threshold)+str(image)))
-
-      end = time. time()
-      f.write('\n The prediction time of this Image +',str(image)+' :'+str(end-start)+'seconds')
+      Y_Image_pred=Y_Image.astype('uint8')
+      filename_image=join(EVALUATION_PATH,str(threshold)+str(image)+'.png')
+      print(filename_image)
+      imsave(filename_image,Y_Image_pred)
 
   else:
     
@@ -134,46 +132,44 @@ def Prediction(Path='',INPUT_WIDTH =256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7,t
       # At the end, we take the average of the values obtained from each pixel on the different predictions.
       # NB_Pred : it is the matrix of prediction numbers of each pixel of the image to predict
       
-      NB_Pred=np.zeros([Image.shape[0],Image.shape[1]],dtype=np.uint8)
+      NB_Pred=np.zeros([Image.shape[0],Image.shape[1]],dtype=np.float32)
       Mask_pred=np.zeros((Image.shape[0],Image.shape[1]),dtype=np.float32)
       print(Image.shape[0],Image.shape[1])
       
       #Try and get an appropriate step for both witdh and height
-      max_step = 50
+      max_step = 10
       step_x = 0
       step_y = 0
       for i in range(1,max_step):
-        if (((Image.shape[0] - INPUT_WIDTH)%i == 0) and (i > step_x)):
-            step_x = i
-        if (((Image.shape[1] - INPUT_HEIGHT)%i == 0) and (i > step_y)):
-            step_y = i
+        if (((Image.shape[0] - INPUT_WIDTH)%(2**i) == 0) and ((2**i) > step_x)) and (((Image.shape[1] - INPUT_HEIGHT)%(2**i) == 0) and ((2**i) > step_y)):
+            step_x = 2**i
+            step_y = 2**i
       print(step_x,step_y)
       
       INPUT=np.zeros([1,Image.shape[0],Image.shape[1],INPUT_CHANNELS],dtype=np.float32)
       INPUT[0,:,:,:]=Image
       INPUT_Normal=data_normalizing.Normalizing_by_image_by_column(INPUT)
-      for x in range(0,(Image.shape[0]-INPUT_WIDTH)+1,step):
-        for y in range(0,(Image.shape[1]-INPUT_HEIGHT)+1,step):
+      for x in range(0,(Image.shape[0]-INPUT_WIDTH)+1,step_x):
+        for y in range(0,(Image.shape[1]-INPUT_HEIGHT)+1,step_y):
           Input_data=np.zeros([1,INPUT_WIDTH,INPUT_HEIGHT,INPUT_CHANNELS],dtype=np.float32)
           Input_data[0,:,:,:]=INPUT_Normal[:,x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT,:]
           results = model.predict(Input_data,verbose=1)
           
           # Prepare for multiplying by the concentric weith matrix
-          #results = np.reshape(results,(96,96))
-          #np.matmul(results,concentric_weights,results)
-          #print(results.shape)
+          results = np.reshape(results,(96,96))
+          results = np.multiply(results,concentric_weights)
+          
           
           #Mask_pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT]+=results[0,0:INPUT_WIDTH,0:INPUT_HEIGHT]
-          NB_Pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT] += 1
+          NB_Pred[x:x+INPUT_WIDTH,y:y+INPUT_HEIGHT] += concentric_weights
           for i in range(INPUT_WIDTH):
             for j in range(INPUT_HEIGHT):
-              Mask_pred[x+i,y+j]+=results[0,i,j]
+              Mask_pred[x+i,y+j]+=results[i,j]
             
             
       NB_Pred_tmp = NB_Pred*20
       filename_verif=join(VERIFICATIONS_PATH,'nb_pred.png')
       imsave(filename_verif,NB_Pred_tmp)
-      NB_Pred[NB_Pred == 0] = 1
       assert(np.count_nonzero(NB_Pred == 0) == 0)
       Mask_pred[:,:] /= NB_Pred[:,:]
       Mask_pred[Mask_pred<=threshold]=0
