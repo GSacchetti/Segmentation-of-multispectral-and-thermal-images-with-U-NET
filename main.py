@@ -1,6 +1,3 @@
-# -*- coding:Utf_8 -*-
-
-
 #This program is for loading data and training the U-NET model
 
 from PIL import Image
@@ -66,12 +63,13 @@ def Training_Unet(mainPath='',Augmentation=True,nb_Augmentation=3,INPUT_WIDTH = 
     X_Train_Normal=np.zeros_like(X_Train)
     X_Test_Normal=np.zeros_like(X_Test)
 
-
+    #X_Train_Normal=data_normalizing.Normalizing_by_image_by_column(X_Train)
+    #X_Test_Normal=data_normalizing.Normalizing_by_image_by_column(X_Test)
     if not Normalization is None:
-       normfunc =  data_normalizing.__dict__[Normalization]
+       normfunc =  getattr(data_normalizing, Normalization)
        X_Train_Normal=normfunc(X_Train)
        X_Test_Normal=normfunc(X_Test)
-    elif 
+    else :
        X_Train_Normal=X_Train
        X_Test_Normal=X_Test
 
@@ -95,15 +93,14 @@ def Training_Unet(mainPath='',Augmentation=True,nb_Augmentation=3,INPUT_WIDTH = 
 
 
 # Loading the weights model U-NET if it exists (True or False)
-Load_weights =False
+Load_weights =True
 
 #Choose whether or not to learn the model
 train_model=True
 
 #mainPath='/Users/rafikarezki/Desktop/Projet-Master/U-NET/'
-mainPath=os.getcwd()
+mainPath='/content/gdrive/My Drive/U-NET'
+#mainPath=os.getcwd()
 
 Training_Unet(mainPath=mainPath,Augmentation=True,nb_Augmentation=3,INPUT_WIDTH = 96,INPUT_HEIGHT = 96, INPUT_CHANNELS = 7, OUTPUT_CHANNELS=1, 
-    Normalization ="Normalisation_by_image_by_column",Train_model=train_model, Load_weights=Load_weights,validation_split=0.1, batch_size = 20, epochs=30)
-
-
+    Normalization ="Normalizing_by_image_by_column",Train_model=train_model, Load_weights=Load_weights,validation_split=0.1, batch_size = 20, epochs=30)
