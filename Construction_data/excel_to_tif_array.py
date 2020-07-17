@@ -1,6 +1,4 @@
-######Script of prdiction #######
-# -*- coding:Utf_8 -*-
-#######.  This algorithm is to convert the excel files into tiff images and arrays.   #######
+This algorithm is to convert the excel files into tiff images and arrays.   #######
 #Our dataset were in the form of excel tables, to convert these tables into a tiff image, I created this Convert function.
 #To perform this conversion, we have calculated a displacement step called "step", 
 #because this table represents a multispectral and thermal georeferential part (you can see the different 
@@ -47,7 +45,7 @@ def Convert(PathImportExcel,PathExportTif,step=12,factor=1000, Nb_channels=7):
 					y=tableau.cell_value(l,2)*factor
 					minY=min(minY,y)
 					maxY=max(maxY,y)
-				#Determination's résolution
+				#Determination's rÃ©solution
 				tab=[]
 				for i in range(1,4000):
 					tab.append(tableau.cell_value(i,1)*factor)
@@ -66,7 +64,8 @@ def Convert(PathImportExcel,PathExportTif,step=12,factor=1000, Nb_channels=7):
 				mymkdir(PathExportTif+'/'+namesubset+'/'+'ImageArray')
 				mymkdir(PathExportTif+'/'+namesubset+'/'+'MaskTif')
 				mymkdir(PathExportTif+'/'+namesubset+'/'+'MaskArray')
-				matrix=np.zeros([size[0],size[1],Nb_channels], dtype=np.float32) 
+				matrix=np.zeros([size[0],size[1],Nb_channels], dtype=np.float32)
+				###liste de channels (faie modif)
 				for h in range(3,10):
 					image= np.zeros((size[0],size[1]), dtype=np.float32) 
 					for l in range(1,tableau.nrows):
@@ -99,16 +98,17 @@ def Convert(PathImportExcel,PathExportTif,step=12,factor=1000, Nb_channels=7):
 				del image
 
 
-mainPath=os.getcwd()
+#mainPath=os.getcwd()
+mainPath = '/content/gdrive/My Drive/U-NET'
 PathImportExcel=mainPath+'/data/Excel/'
 mymkdir(mainPath+'/data/TIFandNPY')
 
-PathExportTif=mainPath'/data/TIFandNPY/'
+PathExportTif=mainPath+'/data/TIFandNPY/'
 
-PathImportExcel='/Users/rafikarezki/Desktop/U-NET_SEGMENTATION/data/Excel/'
-mymkdir('/Users/rafikarezki/Desktop/U-NET_SEGMENTATION/data/TIFandNPY')
+PathImportExcel='/content/gdrive/My Drive/U-NET/data/Excel/'
+mymkdir('/content/gdrive/My Drive/U-NET/data/TIFandNPY')
 
-PathExportTif='/Users/rafikarezki/Desktop/U-NET_SEGMENTATION/data/TIFandNPY/'
+PathExportTif='/content/gdrive/My Drive/U-NET/data/TIFandNPY/'
 #Application of method convert 
 Convert(PathImportExcel,PathExportTif)
 
