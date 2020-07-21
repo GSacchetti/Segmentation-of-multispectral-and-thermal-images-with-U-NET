@@ -1,3 +1,5 @@
+#######.  This algorithm  is to create Test and training data sets of U-NET 
+   #######
 #Loading packages
 import numpy  as np
 import os,sys
@@ -11,7 +13,7 @@ random.seed(2019)
 #mainPath=os.getcwd()
 # The path of our data set
 mainPath='/content/gdrive/My Drive/U-NET/data/'
-PathTIFandNPY=mainPath+'TIFandNPY/'
+PathTIFandNPY=mainPath+'TIFandNPY_[2,3,4,5,6,7]/'
 PathTT=mainPath
 
 
@@ -183,8 +185,3 @@ print('nb_mask_augment=',nb_mask_augment)
 print('nb_image_augment=',nb_image_augment)
 print('nb_image_test=',nb_image_test)
 print('nb_mask_test=',nb_mask_test)
-
-
-
-
-
