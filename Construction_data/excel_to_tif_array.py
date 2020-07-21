@@ -67,7 +67,7 @@ def Convert(PathImportExcel,PathExportTif, channels, step=12,factor=1000):
                 mymkdir(PathExportTif+'/'+namesubset+'/'+'ImageArray')
                 mymkdir(PathExportTif+'/'+namesubset+'/'+'MaskTif')
                 mymkdir(PathExportTif+'/'+namesubset+'/'+'MaskArray')
-                matrix=np.zeros([size[0],size[1],len(channels)+1], dtype=np.float32)
+                matrix=np.zeros([size[0],size[1],len(channels)], dtype=np.float32)
                 ###liste de channels (faire modif) [4,5,6,7,8,9]
                 import pdb as pd
                 #pd.set_trace()
