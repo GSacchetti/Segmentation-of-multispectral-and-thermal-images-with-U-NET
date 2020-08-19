@@ -1,6 +1,3 @@
-# -*- coding:Utf_8 -*-
-
-
 # To avoid any anomaly in the training and test data, we normalized the
 # images in three different ways and then we compared the three best models 
 # of U-net built after learning.
@@ -41,6 +38,3 @@ def Normalizing_By_image(data):
 		image=data[im,:,:,:]
 		datanorm[im,:,:,:]=((image-image.min())/(image.max()-image.min()).astype(np.float32))
 	return datanorm
-		
-
-
