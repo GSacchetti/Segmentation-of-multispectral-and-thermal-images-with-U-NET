@@ -1,8 +1,6 @@
 #these functions are for measuring the accuracy of the model by comparing 
 #the images predicted with the U-NET model and the images of ground truth.
 
-
-
 # Precision measurement function
 import numpy as np
 def measure(beta,pred,mask):
