@@ -13,16 +13,16 @@ import numpy  as np
 import os,sys
 from skimage.io import imsave,imread
 import math
+from os.path import join
+#import pathproject as pp #TODO creation of a file containing every paths
 
 
 def mymkdir(path):
 	if not os.path.exists(path):
 		os.mkdir(path)
 
-#def Convert(PathImportExcel,PathExportTif,step=12,factor=1000, Nb_channels=7):
-def Convert(PathImportExcel,PathExportTif, channels, step=12,factor=1000):
+def Convert(PathImportExcel,PathExportTif, channels=[3,4,5,6,7,8,9], step=12,factor=1000):
     print('The channels used are : ',channels)
-    channels = [x+2 for x in channels]
     #Initialization of indices of images for each channel 
     print(os.listdir(PathImportExcel))
     for element in list(os.listdir(PathImportExcel)):
@@ -62,27 +62,27 @@ def Convert(PathImportExcel,PathExportTif, channels, step=12,factor=1000):
                 size =(round(xSize),round(ySize))
                 print('the image"s size:',size)
                 namesubset=name+'_'+str(k)
-                mymkdir(PathExportTif+namesubset)
-                mymkdir(PathExportTif+'/'+namesubset+'/'+'ImageTif')
-                mymkdir(PathExportTif+'/'+namesubset+'/'+'ImageArray')
-                mymkdir(PathExportTif+'/'+namesubset+'/'+'MaskTif')
-                mymkdir(PathExportTif+'/'+namesubset+'/'+'MaskArray')
+                image_tif_path = join(PathExportTif,namesubset,'ImageTif')
+                image_array_path = join(PathExportTif,namesubset,'ImageArray')
+                mask_tif_path = join(PathExportTif,namesubset,'MaskTif')
+                mask_array_path = join(PathExportTif,namesubset,'MaskArray')
+                mymkdir(join(PathExportTif,namesubset))
+                mymkdir(image_tif_path)
+                mymkdir(image_array_path)
+                mymkdir(mask_tif_path)
+                mymkdir(mask_array_path)
                 matrix=np.zeros([size[0],size[1],len(channels)], dtype=np.float32)
-                ###liste de channels (faire modif) [4,5,6,7,8,9]
-                import pdb as pd
-                #pd.set_trace()
-                for h in channels:
+                for cid, h in enumerate(channels):
                     image= np.zeros((size[0],size[1]), dtype=np.float32)
-                    pd.set_trace()
                     for l in range(1,tableau.nrows):
                         i=math.floor((tableau.cell_value(l,1)*factor-minX+step/2.)/step)
                         j=math.floor((tableau.cell_value(l,2)*factor-minY+step/2.)/step)
                         image[i,j]=(tableau.cell_value(l,h))
-                        #print(h,l)
-                        matrix[i,j,h-3]=tableau.cell_value(l,h)
+                        matrix[i,j,cid]=tableau.cell_value(l,h)
 
                     imageint=(255*(image-image.min())/(image.max()-image.min())).astype(np.uint8)
-                    imsave(PathExportTif+'/'+namesubset+'/'+'ImageTif'+'/'+name+'_'+str(k)+'_B'+str(h-1)+'.tif',imageint)
+                    imsave(join(image_tif_path,name+'_'+str(k)+'_B'+str(cid)+'.tif'),imageint)
+                #np.save(join(image_array_path,namesubset,'_image.npy'),matrix)
                 np.save(PathExportTif+'/'+namesubset+'/'+'ImageArray'+'/'+namesubset+'_image.npy',matrix)
 
                 #SAVE MASK
@@ -113,8 +113,8 @@ def Convert(PathImportExcel,PathExportTif, channels, step=12,factor=1000):
 #PathExportTif=mainPath+'/data/TIFandNPY/'
 
 PathImportExcel='/content/gdrive/My Drive/U-NET/data/Excel/'
-mymkdir('/content/gdrive/My Drive/U-NET/data/TIFandNPY_[2,3,4,5,6,7]')
+mymkdir('/content/gdrive/My Drive/U-NET/data/TIFandNPY')
 
-PathExportTif='/content/gdrive/My Drive/U-NET/data/TIFandNPY_[2,3,4,5,6,7]/'
+PathExportTif='/content/gdrive/My Drive/U-NET/data/TIFandNPY/'
 #Application of method convert 
-Convert(PathImportExcel,PathExportTif,channels=[2,3,4,5,6,7])
+Convert(PathImportExcel,PathExportTif)
