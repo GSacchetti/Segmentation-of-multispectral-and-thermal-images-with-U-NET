@@ -1,5 +1,4 @@
-#######.  This algorithm  is to create Test and training data sets of U-NET 
-   #######
+#######  This algorithm  is to create Test and training data sets of U-NET #######
 #Loading packages
 import numpy  as np
 import os,sys
@@ -7,13 +6,14 @@ from skimage.io import imsave,imread
 from random import sample
 import shutil
 import random
+from os.path import join
 random.seed(2019)
 
 #mainPath='/content/drive/My Drive/U-NET'
 #mainPath=os.getcwd()
 # The path of our data set
 mainPath='/content/gdrive/My Drive/U-NET/data/'
-PathTIFandNPY=mainPath+'TIFandNPY_[2,3,4,5,6,7]/'
+PathTIFandNPY=mainPath+'TIFandNPY/'
 PathTT=mainPath
 
 
@@ -92,10 +92,10 @@ for element in list(os.listdir(PathTIFandNPY)):
 			print(np.shape(imageArray))
 			for i in range(0,np.shape(imageArray)[0]-IMG_WIDTH,IMG_WIDTH//2):
 				for j in range(0,np.shape(imageArray)[1]-IMG_HEIGHT,IMG_HEIGHT//2):
-					np.save(Train_path_images+'/'+'image_'+str(nb_image)+'.npy',imageArray[i:i+IMG_WIDTH,j:j+IMG_HEIGHT])
+					np.save(join(Train_path_images,'image_'+str(nb_image)+'.npy'),imageArray[i:i+IMG_WIDTH,j:j+IMG_HEIGHT])
 					if Augmentation==True:
 						for Augment in range(nb_Augmentation):
-							np.save(Train_path_image_aug+'/'+'image_'+str(nb_image_augment)+'.npy',
+							np.save(join(Train_path_image_aug,'image_'+str(nb_image_augment)+'.npy'),
 								np.rot90(imageArray[i:i+IMG_WIDTH,j:j+IMG_HEIGHT],Augment+1))
 							nb_image_augment=nb_image_augment+1
 					nb_image+=1
@@ -103,11 +103,11 @@ for element in list(os.listdir(PathTIFandNPY)):
 
 			for i in range(np.shape(imageArray)[0]-IMG_WIDTH,IMG_WIDTH,-IMG_WIDTH//2):
 				for j in range(np.shape(imageArray)[1]-IMG_HEIGHT,IMG_HEIGHT,-IMG_HEIGHT//2):
-					np.save(Train_path_images+'/'+'image_'+str(nb_image)+'.npy',
+					np.save(join(Train_path_images,'image_'+str(nb_image)+'.npy'),
 						imageArray[i-IMG_WIDTH:i,j-IMG_HEIGHT:j])
 					if Augmentation==True:
 						for Augment in range(nb_Augmentation):
-							np.save(Train_path_image_aug+'/'+'image_'+str(nb_image_augment)+'.npy',
+							np.save(join(Train_path_image_aug,'image_'+str(nb_image_augment)+'.npy'),
 								np.rot90(imageArray[i-IMG_WIDTH:i,j-IMG_HEIGHT:j],Augment+1))
 							nb_image_augment=nb_image_augment+1
 					nb_image+=1
@@ -118,12 +118,12 @@ for element in list(os.listdir(PathTIFandNPY)):
 			print(Train_Path_mask+element_id)
 			for i in range(0,np.shape(MaskArray)[0]-IMG_WIDTH,IMG_WIDTH//2):
 				for j in range(0,np.shape(MaskArray)[1]-IMG_HEIGHT,IMG_HEIGHT//2):
-					np.save(Train_path_masks+'/'+'mask_'+str(nb_mask)+'.npy',
+					np.save(join(Train_path_masks,'mask_'+str(nb_mask)+'.npy'),
 						MaskArray[i:i+IMG_WIDTH,j:j+IMG_HEIGHT])
 					
 					if Augmentation==True:
 						for Augment in range(nb_Augmentation):
-							np.save(Train_path_mask_aug+'mask_'+str(nb_mask_augment)+'.npy',
+							np.save(join(Train_path_mask_aug,'mask_'+str(nb_mask_augment)+'.npy'),
 								np.rot90(MaskArray[i:i+IMG_WIDTH,j:j+IMG_HEIGHT],Augment+1))
 							nb_mask_augment+=1
 					nb_mask+=1
@@ -131,11 +131,11 @@ for element in list(os.listdir(PathTIFandNPY)):
 
 			for i in range(np.shape(MaskArray)[0]-IMG_WIDTH,IMG_WIDTH,-IMG_WIDTH//2):
 				for j in range(np.shape(MaskArray)[1]-IMG_HEIGHT,IMG_HEIGHT,-IMG_HEIGHT//2):
-					np.save(Train_path_masks+'/'+'mask_'+str(nb_mask)+'.npy',
+					np.save(join(Train_path_masks,'mask_'+str(nb_mask)+'.npy'),
 						MaskArray[i-IMG_WIDTH:i,j-IMG_HEIGHT:j])
 					if Augmentation==True:
 						for Augment in range(nb_Augmentation):
-							np.save(Train_path_mask_aug+'/'+'mask_'+str(nb_mask_augment)+'.npy',
+							np.save(join(Train_path_mask_aug,'mask_'+str(nb_mask_augment)+'.npy'),
 								np.rot90(MaskArray[i-IMG_WIDTH:i,j-IMG_HEIGHT:j],Augment+1))
 							nb_mask_augment+=1
 					nb_mask+=1
@@ -151,13 +151,13 @@ for element in list(os.listdir(PathTIFandNPY)):
 
 			for i in range(0,np.shape(imageArray)[0]-IMG_WIDTH,IMG_WIDTH//2):
 				for j in range(0,np.shape(imageArray)[1]-IMG_HEIGHT,IMG_HEIGHT//2):
-					np.save(Test_path_images+'image_'+str(nb_image_test)+'.npy',
+					np.save(join(Test_path_images,'image_'+str(nb_image_test)+'.npy'),
 						imageArray[i:i+IMG_WIDTH,j:j+IMG_HEIGHT]) 
 					nb_image_test=nb_image_test+1
 
 			for i in range(np.shape(imageArray)[0]-IMG_WIDTH,IMG_WIDTH,-IMG_WIDTH//2):
 				for j in range(np.shape(imageArray)[1]-IMG_HEIGHT,IMG_HEIGHT,-IMG_HEIGHT//2):
-					np.save(Test_path_images+'image_'+str(nb_image_test)+'.npy',
+					np.save(join(Test_path_images,'image_'+str(nb_image_test)+'.npy'),
 						imageArray[i-IMG_WIDTH:i,j-IMG_HEIGHT:j]) 
 					nb_image_test=nb_image_test+1
 
@@ -168,13 +168,13 @@ for element in list(os.listdir(PathTIFandNPY)):
 
 			for i in range(0,np.shape(maskArray)[0]-IMG_WIDTH,IMG_WIDTH//2):
 				for j in range(0,np.shape(maskArray)[1]-IMG_HEIGHT,IMG_HEIGHT//2):
-					np.save(Test_path_masks+'mask_'+str(nb_mask_test)+'.npy',
+					np.save(join(Test_path_masks,'mask_'+str(nb_mask_test)+'.npy'),
 						maskArray[i:i+IMG_WIDTH,j:j+IMG_HEIGHT]) 
 					nb_mask_test=nb_mask_test+1
 
 			for i in range(np.shape(maskArray)[0]-IMG_WIDTH,IMG_WIDTH,-IMG_WIDTH//2):
 				for j in range(np.shape(maskArray)[1]-IMG_HEIGHT,IMG_HEIGHT,-IMG_HEIGHT//2):
-					np.save(Test_path_masks+'mask_'+str(nb_mask_test)+'.npy',
+					np.save(join(Test_path_masks,'mask_'+str(nb_mask_test)+'.npy'),
 						maskArray[i-IMG_WIDTH:i,j-IMG_HEIGHT:j]) 
 					nb_mask_test=nb_mask_test+1
 
