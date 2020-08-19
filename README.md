@@ -19,7 +19,7 @@ run "pip install -r requirements.txt"
 
 Run "python main.py"
 
-By default the training will be done on the following channels [0,1,2,3,4,5,6], this can be changed by accessing the main.py file.
+By default the training will be done on the following channels [0,1,2,3,4,5,6], this can be changed by running python main.py "[...]" with within the brackets the wanted channels.
 
 To load a weight file to try and improve the training, change Load_weight to True in main.py, and if you want to train on a specific weight file, also change the name of that weight file in model_unet.py
 
@@ -29,6 +29,11 @@ To load a weight file to try and improve the training, change Load_weight to Tru
 Multiple weight files are provided, each with the channels used to get them.
 
 Run "python pred_unet.py"
+
+By default the prediction will be done on the following channels [0,1,2,3,4,5,6], this can be changed by running python pred_unet.py [...] with wothin the brackets the wanted channels. 
+
+To make prediction on the image contained in image_to_pred/ImageArray, don't put a second argument or add "npy".
+To make predictions on the Dalles, add "tif" as such python pred_unet.py "[0,1,2,3,4,5,6]" "tif".
 
 
 Note: For any instruction, remember to check the correspondance of the parameters in the scripts 
