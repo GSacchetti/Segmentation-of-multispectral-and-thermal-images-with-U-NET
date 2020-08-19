@@ -1,5 +1,3 @@
-# -*- coding:Utf_8 -*-
-
 from tensorflow import keras
 from keras.models import Model,load_model,save_model
 from keras.layers import Input
@@ -31,46 +29,46 @@ def Model_Unet(INPUT_WIDTH = 256, INPUT_HEIGHT = 256,INPUT_CHANNELS = 7):
 	conv2 = Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv2)
 	pool2 = MaxPooling2D((2, 2)) (conv2)
 
-	conv3 = Conv2D(64, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (pool2)
+	conv3 = Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (pool2)
 	conv3 = Dropout(0.2) (conv3)
-	conv3 = Conv2D(64, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (conv3)
+	conv3 = Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv3)
 	pool3 = MaxPooling2D((2, 2)) (conv3)
 
-	conv4 = Conv2D(128, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (pool3)
+	conv4 = Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (pool3)
 	conv4 = Dropout(0.2) (conv4)
-	conv4 = Conv2D(128, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (conv4)
+	conv4 = Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv4)
 	pool4 = MaxPooling2D(pool_size=(2, 2)) (conv4)
 
 	#Part 02: BOTTELNECK
-	conv5 = Conv2D(256, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (pool4)
+	conv5 = Conv2D(256, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (pool4)
 	conv5 = Dropout(0.3) (conv5)
-	conv5 = Conv2D(256, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (conv5)
+	conv5 = Conv2D(256, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv5)
 	
 	#Part 03: UP_BLOC
 
 	up6 = Conv2DTranspose(128, (2, 2), strides=(2, 2), padding='same') (conv5)
 	up6 = concatenate([up6, conv4])
-	conv6 = Conv2D(128, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (up6)
+	conv6 = Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (up6)
 	conv6 = Dropout(0.2) (conv6)
-	conv6 = Conv2D(128, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (conv6)
+	conv6 = Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv6)
 
 	up7 = Conv2DTranspose(64, (2, 2), strides=(2, 2), padding='same') (conv6)
 	up7 = concatenate([up7, conv3])
-	conv7 = Conv2D(64, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (up7)
+	conv7 = Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (up7)
 	conv7 = Dropout(0.2) (conv7)
-	conv7 = Conv2D(64, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (conv7)
+	conv7 = Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv7)
 
 	up8 = Conv2DTranspose(32, (2, 2), strides=(2, 2), padding='same') (conv7)
 	up8 = concatenate([up8, conv2])
-	conv8 = Conv2D(32, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (up8)
+	conv8 = Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (up8)
 	conv8 = Dropout(0.1) (conv8)
-	conv8 = Conv2D(32, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (conv8)
+	conv8 = Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv8)
 
 	up9 = Conv2DTranspose(16, (2, 2), strides=(2, 2), padding='same') (conv8)
 	up9 = concatenate([up9, conv1], axis=3)
-	conv9 = Conv2D(16, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (up9)
+	conv9 = Conv2D(16, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (up9)
 	conv9 = Dropout(0.1) (conv9)
-	conv9 = Conv2D(16, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (conv9)
+	conv9 = Conv2D(16, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same') (conv9)
 
 	outputs = Conv2D(1, (1, 1), activation='sigmoid') (conv9)
 
@@ -92,9 +90,16 @@ def Training_Model(Train_model=True, Load_weights=True, validation_split=0.01, b
 	model=Model_Unet(INPUT_WIDTH =INPUT_WIDTH, INPUT_HEIGHT = INPUT_HEIGHT,INPUT_CHANNELS = INPUT_CHANNELS)
 
 	#load of weights model
-	model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
+	
+	# The two following lines introduce a decay for the learning rate
+	#lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=1e-2, decay_steps=10000, decay_rate=0.9)
+    #optimizer = keras.optimizers.Adam(lr=lr_schedule)
+
+    # Unquote the two previous line and quote the next line to get the decay
+	optimizer = keras.optimizers.Adam(lr=0.01) #This line allows us to change the learning rate of the optimizer
+	model.compile(loss='binary_crossentropy',optimizer=optimizer,metrics=['accuracy'])
 	model.summary()
-	earlystopper = EarlyStopping(patience=5, verbose=1)
+	earlystopper = EarlyStopping(patience=20, verbose=1)
 	checkpointer = ModelCheckpoint('model-U_NET.h5', verbose=1, save_best_only=True)
 
 	if Load_weights==True :
